@@ -2,7 +2,7 @@
 #include <string>
 
 typedef union addr{
-    std::string street;
+    char street[1000];
     int district;
 } addr;
 
@@ -11,7 +11,7 @@ typedef struct Client{
     std::string first_name;
     std::string patronymic;
     bool hasStreet;
-    std::string street;
+    addr address;
     int house;
     int flat;
     int discount;

@@ -2,6 +2,7 @@
 #include <string>
 #include "Struct.h"
 
+
 int CheckUnsigned() {
     int input;
 	char next;
@@ -52,19 +53,19 @@ int CheckNumberOfArray(int size) {
     return input;
 }
 
-// bool CheckSreetOrDistrict(){
-//     int input;
-//     input = CheckUnsigned();
-//     while(1){
-//         if (input == 0){
-//             return 0;
-//         }
-//         else if (input == 1){
-//             return 1;
-//         }
-//         std::cout << "Неверный ответ!\n";
-//     }
-// }
+bool CheckSreetOrDistrict(){
+    int input;
+    while(1){
+        input = CheckUnsigned();
+        if (input == 0){
+            return 0;
+        }
+        else if (input == 1){
+            return 1;
+        }
+        std::cout << "Неверный ответ!\n";
+    }
+}
 
 Client *AddSpace(Client *client, int *size){
     Client *new_client = new Client [*size + 1];
@@ -88,67 +89,78 @@ Client *DeleteSpace(Client *client, int *size){
     return new_client;
 }
 
-void EnterClient(Client *client, std::string special_street, int special_discount){
+void EnterClient(Client *client, std::string special_street, int special_disrict, int special_discount){
     std::cout << "Введите фамилию: ";
     std::cin >> client->last_name;
     std::cout << "Введите имя: ";
     std::cin >> client->first_name;
     std::cout << "Введите отчество: ";
     std::cin >> client->patronymic;
-    // std::cout << "Ввести улицу или раён? (1 - улицу, 0 - раён): ";
-    // client->hasStreet = CheckSrettOrDistrict();
-    // if (client->hasStreet){
+    std::cout << "Ввести улицу или микрорайон? (1 - улицу, 0 - микрорайон): ";
+    client->hasStreet = CheckSreetOrDistrict();
+    if (client->hasStreet){
         std::cout << "Введите улицу, на которой проживает клиент: ";
-        std::cin >> client->street;
-    // }
-    // else {
-    //     std::cout << "Введите раён, в котором проживает клиент: ";
-    //     std::cin >> client->address.district;
-    // }
+        std::cin >> client->address.street;
+    }
+    else {
+        std::cout << "Введите микрорайон, в котором проживает клиент: ";
+        client->address.district = CheckUnsigned();
+    }
     std::cout << "Введите дом, в котором проживает клиент: ";
     client->house = CheckUnsigned();
     std::cout << "Введите квартиру, в которой проживает клиент: ";
     client->flat = CheckUnsigned();
-    if (client->street == special_street) {
-        client->discount = special_discount;
+    if (client->hasStreet){
+        if (client->address.street == special_street) {
+            client->discount = special_discount;
+        }
+        else {
+            std::cout << "Введите скидку: ";
+            client->discount = CheckDiscount();
+        }
     }
     else {
-        std::cout << "Введите скидку: ";
-        client->discount = CheckDiscount();
+        if (client->address.district == special_disrict) {
+            client->discount = special_discount;
+        }
+        else {
+            std::cout << "Введите скидку: ";
+            client->discount = CheckDiscount();
+        }
     }
 }
 
-Client *EnterWithSize(int size, std::string special_steet, int special_discount){
+Client *EnterWithSize(int size, std::string special_street, int special_disrict, int special_discount){
     Client *client = new Client[size];
 
     for (int i = 0; i < size; i++){
         std::cout << i + 1 << " клиент\n";
-        EnterClient(client + i, special_steet, special_discount);
+        EnterClient(client + i, special_street, special_disrict, special_discount);
     }
     return client;
 }
 
-Client *EnterWithStop(int *size, std::string special_steet, int special_discount){
+Client *EnterWithStop(int *size, std::string special_street, int special_disrict, int special_discount){
     int stop_discount;
     std::cout << "Введите максимальную скидку, после которой прекращается ввод: ";
     stop_discount = CheckDiscount();
-    Client *client;
+    Client *client = nullptr;
     do {
         client = AddSpace(client, size);
         std::cout << *size << " клиент\n";
-        EnterClient(client + *size - 1, special_steet, special_discount);
+        EnterClient(client + *size - 1, special_street, special_disrict, special_discount);
     } while (client[*size - 1].discount < stop_discount);
 
     return client;
 }
 
-Client *EnterWithDialog(int *size, std::string special_steet, int special_discount){
+Client *EnterWithDialog(int *size, std::string special_street, int special_disrict, int special_discount){
     Client *client = nullptr;
     bool exit;
     while (1) {
         client = AddSpace(client, size);
         std::cout << *size << " клиент\n";
-        EnterClient(client + *size - 1, special_steet, special_discount);
+        EnterClient(client + *size - 1, special_street, special_disrict, special_discount);
         std::string input;
         std::cout << "Продолжить(y/n)\n";
         std::cin >> input;
@@ -171,8 +183,14 @@ void OutputClient(Client client){
     std::cout << client.first_name;
     std::cout << "\nОтчество: ";
     std::cout << client.patronymic;
-    std::cout << "\nУлица, на которой проживает клиент: ";
-    std::cout << client.street;
+    if (client.hasStreet){
+        std::cout << "\nУлица, на которой проживает клиент: ";
+        std::cout << client.address.street;
+    }
+    else{
+        std::cout << "\nМикрорайон, в котором проживает клиент: ";
+        std::cout << client.address.district;
+    }
     std::cout << "\nДом, в котором проживает клиент: ";
     std::cout << client.house;
     std::cout << "\nКвартира, в которой проживает клиент: ";
@@ -210,9 +228,9 @@ void ShowInformation(Client* client, int size){
     }
 }
 
-Client *AddClient(Client * client, int * size, std::string special_steet, int special_discount){
+Client *AddClient(Client * client, int * size, std::string special_street, int special_disrict, int special_discount){
     client = AddSpace(client, size);
-    EnterClient(client + *size - 1, special_steet, special_discount);
+    EnterClient(client + *size - 1, special_street, special_disrict, special_discount);
 
     return client;
 }
@@ -221,16 +239,21 @@ int FindClient(Client * client, int start, int end, int n_feature, int feature){
     for (int i = start; i < end;i++){
         switch(n_feature){
         case 5:
-            if (client[i].house == feature){
+            if (client[i].address.district == feature){
                 return i;
             }
             break;
         case 6:
-            if (client[i].flat == feature){
+            if (client[i].house == feature){
                 return i;
             }
             break;
         case 7:
+            if (client[i].flat == feature){
+                return i;
+            }
+            break;
+        case 8:
             if (client[i].discount == feature){
                 return i;
             }
@@ -260,7 +283,7 @@ int FindClient(Client * client, int start, int end, int n_feature, std::string f
             }
             break;
         case 4:
-            if (client[i].street == feature){
+            if (client[i].address.street == feature){
                 return i;
             }
             break;
@@ -287,16 +310,16 @@ Client *ChooseForDelete(Client *client, int *size){
     int input, feature_i, find;
     std::string feature_s;
     std::cout << "Введите признак, по которому необходимо удалить клиента:\n";
-    std::cout << "1 - Фамилия\n2 - Имя\n3 - Отчечтво\n4 - Улица\n5 - Дом\n6 - Квартира\n7 - Скидка\n8 - Номер\n";
+    std::cout << "1 - Фамилия\n2 - Имя\n3 - Отчечтво\n4 - Улица\n5 - Микрорайон\n6 - Дом\n7 - Квартира\n8 - Скидка\n9 - Номер\n";
     while (1){
         input = CheckUnsigned();
-        if (input <= 8 && input >= 1){
+        if (input <= 9 && input >= 1){
             break;
         }
         std::cout << "Неверный номер!\n";
     }
 
-    if (input == 8){
+    if (input == 9){
         std::cout << "Введите номер клинта, которого необходимо удалить: ";
         feature_i = CheckNumberOfArray(*size);
         client = DeleteClient(client, size, feature_i - 1);
@@ -335,7 +358,7 @@ Client *ChooseForChange(Client * client, int size){
     bool exit = false;
     while (!exit){
         std::cout << "Выберите, что вы хотите поменять:\n";
-        std::cout << "1 - Фамилия\n2 - Имя\n3 - Отчечтво\n4 - Улица\n5 - Дом\n6 - Квартира\n7 - Скидка\n8 - Выйти\n";
+        std::cout << "1 - Фамилия\n2 - Имя\n3 - Отчечтво\n4 - Улица\n5 - Микрорайон\n6 - Дом\n7 - Квартира\n8 - Скидка\n9 - Выйти\n";
         int input;
         std::cin >> input;
         switch (input){
@@ -353,21 +376,31 @@ Client *ChooseForChange(Client * client, int size){
             break;
         case 4:
             std::cout << "Введите новую улицу: ";
-            std::cin >> client[number].street;
+            std::cin >> client[number].address.street;
+            if (!client[number].hasStreet){
+                client[number].hasStreet = 1;
+            }
             break;
         case 5:
+            std::cout << "Введите новый микрорайон: ";
+            client[number].address.district = CheckUnsigned();
+            if (client[number].hasStreet){
+                client[number].hasStreet = 0;
+            }
+            break;
+        case 6:
             std::cout << "Введите новый дом: ";
             client[number].house = CheckUnsigned();
             break;
-        case 6:
+        case 7:
             std::cout << "Введите новую квартиру: ";
             client[number].flat = CheckUnsigned();
             break;
-        case 7:
+        case 8:
             std::cout << "Введите новую скидку: ";
             client[number].discount = CheckDiscount();
             break;
-        case 8:
+        case 9:
             exit = true;
             break;
         default:
@@ -387,7 +420,7 @@ void ChooseForFind(Client * client, int size){
     std::string feature_s;
     int find;
     std::cout << "Введите признак, по которому необходимо вывести клиента:\n";
-    std::cout << "1 - Фамилия\n2 - Имя\n3 - Отчечтво\n4 - Улица\n5 - Дом\n6 - Квартира\n7 - Скидка\n";
+    std::cout << "1 - Фамилия\n2 - Имя\n3 - Отчечтво\n4 - Улица\n5 - Микрорайон\n6 - Дом\n7 - Квартира\n8 - Скидка\n";
     while (1){
         input = CheckUnsigned();
         if (input <= 8 && input >= 1){
