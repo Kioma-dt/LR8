@@ -3,6 +3,28 @@
 #include <cmath>
 #include "Struct.h"
 
+Call *AddSpace(Call *call, int *size){
+    Call *new_call = new Call [*size + 1];
+    for (int i = 0; i < *size; i++) {
+        new_call[i] = call[i];
+    }
+    delete[] call;
+    (*size)++;
+
+    return new_call;
+}
+
+Call *DeleteSpace(Call *call, int *size){
+    Call *new_call = new Call[*size - 1];
+    for (int i = 0; i < *size - 1; i++) {
+        new_call[i] = call[i];
+    }
+    delete[] call;
+    (*size)--;
+
+    return new_call;
+}
+
 int NameToCode(std::string name, std::string * cities, int * codes, int n_cities){
     for (int i = 0; i < n_cities;i++){
         if (name == cities[i]){
@@ -76,7 +98,7 @@ int CheckNumberOfArray(int size) {
         if (input <= size && input != 0){
             break;
         }
-        std::cout << "Нет клиента с таким номером!\n";
+        std::cout << "Нет звонка с таким номером!\n";
     }
 
     return input;
@@ -150,7 +172,7 @@ City CheckCity(bool hasName, std::string * cities, int * codes, int n_cities){
             std::cout << "Нет города с таким именем!\n";
         }
         else{
-            std::cin >> city.code;
+            city.code = CheckUnsigned();
             for (int i = 0; i < n_cities;i++){
                 if (city.code == codes[i]){
                     return city;
@@ -282,8 +304,223 @@ void OutputCall(Call call){
     std::cout << "\nCтоимость одной минуты звонка: ";
     std::cout << call.cost;
     std::cout << "\nНомер телефона в этом городе: ";
-    std::cout << call.number_caller;
-    std::cout << "\nНомер телефона абонента: ";
     std::cout << call.number_city;
+    std::cout << "\nНомер телефона абонента: ";
+    std::cout << call.number_caller;
     std::cout << "\n";
+}
+
+void ShowInformation(Call * call, int size){
+    if (size == 0){
+        std::cout << "Нет звонков!\n";
+        return;
+    }
+    int number;
+    std::cout << "Введите номер звонка (0 - показать все звонки): ";
+    while (1){
+        number = CheckUnsigned();
+        if (number <= size){
+            break;
+        }
+        std::cout << "Нет звонка с таким номером!\n";
+    }
+    if (number == 0){
+        for (int i = 0; i < size;i++){
+            std::cout << i + 1 << " звонок\n";
+            OutputCall(call[i]);
+            std::cout << '\n';
+        }
+    }
+    else {
+        std::cout << number << " звонок\n";
+        OutputCall(call[number - 1]);
+        std::cout << '\n';
+    }
+}
+
+Call *AddCall(Call * call, int * size, std::string * cities, int * codes, int n_cities, bool random_numbers){
+    call = AddSpace(call, size);
+    EnterCall(call + *size - 1, cities, codes, n_cities, random_numbers);
+
+    return call;
+}
+
+int FindCall(Call * call, int start, int end, int n_feature, int feature_i, double feature_d, std::string feature_s){
+    for (int i = start; i < end;i++){
+        switch(n_feature){
+        case 1:
+            if (call[i].year == feature_i){
+                return i;
+            }
+            break;
+        case 2:
+            if (call[i].month == feature_i){
+                return i;
+            }
+            break;
+        case 3:
+            if (call[i].day == feature_i){
+                return i;
+            }
+            break;
+        case 4:
+            if (call[i].city.name == feature_s){
+                return i;
+            }
+            break;
+        case 5:
+            if (call[i].city.code == feature_i){
+                return i;
+            }
+            break;
+        case 6:
+            if (call[i].time == feature_i){
+                return i;
+            }
+            break;
+        case 7:
+            if (call[i].cost == feature_d){
+                return i;
+            }
+            break;
+        case 8:
+            if (call[i].number_city == feature_i){
+                return i;
+            }
+            break;
+        case 9:
+            if (call[i].number_caller == feature_i){
+                return i;
+            }
+            break;
+        }
+    }
+
+    return -1;
+}
+
+Call *DeleteCall(Call * call, int * size, int number){
+    for (int i = number + 1; i < *size; i++){
+        std::swap(call[i], call[i - 1]);
+    }
+    call = DeleteSpace(call, size);
+
+    return call;
+}                 
+Call *ChooseForDelete(Call * call, int * size){
+    if (*size == 0){
+        std::cout << "Нет звонков!\n";
+        return call;
+    }
+    int input, find;
+    int feature_i = -1;
+    double feature_d = -1;
+    std::string feature_s = "ERROR";
+    std::cout << "Введите признак, по которому необходимо удалить звонок:\n";
+    std::cout << "1 - Год\n2 - Месяц\n3 - День\n4 - Название города\n5 - Код города\n6 - Время звонка\n";
+    std::cout << "7 - Стоимость минуты\n8 - Номер телефона из города\n9 - Номер телефона абонента\n10 - Номер\n";
+    while (1){
+        input = CheckUnsigned();
+        if (input <= 10 && input >= 1){
+            break;
+        }
+        std::cout << "Неверный номер!\n";
+    }
+
+    if (input == 10){
+        std::cout << "Введите номер клинта, которого необходимо удалить: ";
+        feature_i = CheckNumberOfArray(*size);
+        call = DeleteCall(call, size, feature_i - 1);
+    }
+    else if (input <= 3 || input == 5 || input == 6 || input >=8){
+        std::cout << "Введите значение признака: ";
+        feature_i = CheckUnsigned();
+        find = FindCall(call, 0, *size, input, feature_i, feature_d, feature_s);
+        while (find != -1){
+            call = DeleteCall(call, size, find);
+            find = FindCall(call, find, *size, input, feature_i, feature_d, feature_s);
+        }
+    }
+    else if(input == 7){
+        std::cout << "Введите значение признака: ";
+        feature_d = CheckDouble();
+        find = FindCall(call, 0, *size, input, feature_i, feature_d, feature_s);
+        while (find != -1){
+            call = DeleteCall(call, size, find);
+            find = FindCall(call, find, *size, input, feature_i, feature_d, feature_s);
+        }
+    }
+    else {
+        std::cout << "Введите значение признака: ";
+        std::cin >> feature_s;
+        find = FindCall(call, 0, *size, input, feature_i, feature_d, feature_s);
+        while (find != -1){
+            call = DeleteCall(call, size, find);
+            find = FindCall(call, find, *size, input, feature_i, feature_d, feature_s);
+        }
+    }
+
+    return call;
+} 
+
+Call *ChooseForChange(Call * call, int size, std::string * cities, int * codes, int n_cities){
+    if (size == 0){
+        std::cout << "Нет звонков!\n";
+        return call;
+    }
+    int number;
+    std::cout << "Введите номер звонка, данные которого вы хотите поменять: ";
+    number = CheckNumberOfArray(size);
+    number--;
+    bool exit = false;
+    while (!exit){
+        std::cout << "Выберите, что вы хотите поменять:\n";
+        std::cout << "1 - Дата\n2 - Название города\n3 - Код города\n4 - Время звонка\n";
+        std::cout << "5 - Стоимость минуты\n6 - Номер телефона из города\n7 - Номер телефона абонента\n8 - Выйти\n";
+        int input;
+        input = CheckUnsigned();
+        switch (input){
+        case 1:
+            std::cout << "Введите новый год: ";
+            call[number].year = CheckDate(3, call[number]);
+            std::cout << "Введите новый месяц: ";
+            call[number].month = CheckDate(2, call[number]);
+            std::cout << "Введите новый день: ";
+            call[number].day = CheckDate(1, call[number]);
+            break;
+        case 2:
+            std::cout << "Введите новое название города: ";
+            call[number].hasName = 1;
+            call[number].city = CheckCity(call[number].hasName, cities, codes, n_cities);
+            break;
+        case 3:
+            std::cout << "Введите новый код города: ";
+            call[number].hasName = 0;
+            call[number].city = CheckCity(call[number].hasName, cities, codes, n_cities);
+            break;
+        case 4:
+            std::cout << "Введите новое врямя звонка: ";
+            call[number].time = CheckUnsigned();
+            break;
+        case 5:
+            std::cout << "Введите новую стоимость минуты: ";
+            call[number].cost = CheckDouble();
+            break;
+        case 6:
+            std::cout << "Введите новый номер телефона из города: ";
+            call[number].number_city = CheckTellNumber(1, call[number], cities, codes, n_cities);
+            break;
+        case 7:
+            std::cout << "Введите новый номер телефона абонента: ";
+            call[number].number_caller = CheckTellNumber(0, call[number], cities, codes, n_cities);
+            break;
+        case 8:
+            exit = true;
+            break;
+        default:
+            std::cout << "Неверный номер!\n";
+        }
+    }
+
+    return call;
 }
