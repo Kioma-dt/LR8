@@ -8,6 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/home/roma/Documents/453503/ОАиП/LR8/Task_2/Functions.cpp" "CMakeFiles/main.dir/Functions.cpp.o" "gcc" "CMakeFiles/main.dir/Functions.cpp.o.d"
   "/home/roma/Documents/453503/ОАиП/LR8/Task_2/main.cpp" "CMakeFiles/main.dir/main.cpp.o" "gcc" "CMakeFiles/main.dir/main.cpp.o.d"
   )
 

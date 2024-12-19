@@ -150,4 +150,5 @@ CMakeFiles/main.dir/main.cpp.o: \
  /usr/include/c++/13/bits/basic_ios.tcc \
  /usr/include/c++/13/bits/ostream.tcc /usr/include/c++/13/istream \
  /usr/include/c++/13/bits/istream.tcc \
+ /home/roma/Documents/453503/ОАиП/LR8/Task_2/Functions.h \
  /home/roma/Documents/453503/ОАиП/LR8/Task_2/Struct.h
