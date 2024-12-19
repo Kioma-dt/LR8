@@ -7,9 +7,9 @@ typedef union City{
 } City;
 
 typedef struct Call{
-    int day;
-    int month;
     int year;
+    int month;
+    int day;
     bool hasName;
     City city;
     int time;

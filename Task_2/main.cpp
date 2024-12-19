@@ -22,8 +22,42 @@ int main(){
     std::cout << "\n---------------------------------------------\n";
     call = EnterWithSize(&size, cities, codes, n_cities, random_numbers);
 
-    for (int i = 0; i < size;i++){
-        std::cout << '\n' << i + 1 << " звонок\n";
-        OutputCall(call[i]);
+    while (!exit){
+        std::cout << "\n-----------------------------------\n";
+        std::cout << "Выберите действие:\n";
+        std::cout << "1 - показать информацию\n";
+        std::cout << "2 - добавить звонок\n";
+        std::cout << "3 - удалить звонок\n";
+        std::cout << "4 - изменить информацию о звонке\n";
+        std::cout << "5 - вывести по каждому городу общее время разговора и сумму\n";
+        std::cout << "6 - выйти\n";
+        int input;
+        input = CheckUnsigned();
+        switch (input){
+        case 1:
+            ShowInformation(call, size);
+            break;
+        case 2:
+            call = AddCall(call, &size, cities, codes, n_cities, random_numbers);
+            break;
+        case 3:
+            call = ChooseForDelete(call, &size);
+            break;
+        case 4:
+            call = ChooseForChange(call, size, cities, codes, n_cities);
+            break;
+        // case 5:
+        //     ChooseForFind(client, size);
+        //     break;
+        case 6:
+            exit = true;
+            break;
+        default:
+            std::cout << "Неверный номер!\n";
+        }
     }
+
+    delete[] call;
+    delete[] codes;
+    delete[] cities;
 }

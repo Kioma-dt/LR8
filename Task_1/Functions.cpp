@@ -360,7 +360,7 @@ Client *ChooseForChange(Client * client, int size){
         std::cout << "Выберите, что вы хотите поменять:\n";
         std::cout << "1 - Фамилия\n2 - Имя\n3 - Отчечтво\n4 - Улица\n5 - Микрорайон\n6 - Дом\n7 - Квартира\n8 - Скидка\n9 - Выйти\n";
         int input;
-        std::cin >> input;
+        input = CheckUnsigned();
         switch (input){
         case 1:
             std::cout << "Введите новую фамилию: ";

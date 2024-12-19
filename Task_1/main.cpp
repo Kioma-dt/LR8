@@ -59,7 +59,7 @@ int main(){
         std::cout << "7 - вывести клиентов со скидкой 5%(при этом клиенты будут отсортированы по возрастанию скидки)\n";
         std::cout << "8 - выйти\n";
         int input;
-        std::cin >> input;
+        input = CheckUnsigned();
         switch (input){
         case 1:
             ShowInformation(client, size);
