@@ -2,7 +2,7 @@
 #pragma once
 
 typedef union City{
-    char name[100];
+    char name[1000];
     int code;
 } City;
 

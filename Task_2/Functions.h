@@ -7,7 +7,9 @@ int NameToCode(std::string, std::string *, int *, int);
 std::string CodeToName(int, std::string *, int *, int);
 unsigned long long CheckUnsigned();
 int CheckNumberOfArray(int);
-int CheckDate(int type, Call);                                              // Проверка даты(type = 1 - день, type = 2 - месяц, type = 3 - год)
+std::string CheckName(std::string *, int);
+int CheckCode(int *, int);
+int CheckDate(int type, Call);                                                                      // Проверка даты(type = 1 - день, type = 2 - месяц, type = 3 - год)
 bool CheckNameOrCode();
 City CheckCity(bool, std::string *, int *, int);
 unsigned long long CheckTellNumber(bool, Call, std::string *, int *, int);
@@ -17,7 +19,8 @@ Call *EnterWithSize(int *, std::string *, int *, int, bool);
 void OutputCall(Call);
 void ShowInformation(Call *, int);
 Call *AddCall(Call *, int *, std::string *, int *, int, bool);
-int FindCall(Call *, int, int, int, int, double, std::string);               
+int FindCall(Call *, int, int, int, int, double, std::string, std::string *, int *, int);               
 Call *DeleteCall(Call *, int *, int);                 
-Call *ChooseForDelete(Call *, int *); 
-Call *ChooseForChange(Call *, int, std::string *, int *, int); 
+Call *ChooseForDelete(Call *, int *, std::string *, int *, int); 
+Call *ChooseForChange(Call *, int, std::string *, int *, int);
+void OutputCities(Call *, int, std::string *, int *, int);
