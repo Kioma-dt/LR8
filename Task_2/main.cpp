@@ -41,14 +41,14 @@ int main(){
             call = AddCall(call, &size, cities, codes, n_cities, random_numbers);
             break;
         case 3:
-            call = ChooseForDelete(call, &size);
+            call = ChooseForDelete(call, &size, cities, codes, n_cities);
             break;
         case 4:
             call = ChooseForChange(call, size, cities, codes, n_cities);
             break;
-        // case 5:
-        //     ChooseForFind(client, size);
-        //     break;
+        case 5:
+            OutputCities(call, size, cities, codes, n_cities);
+            break;
         case 6:
             exit = true;
             break;

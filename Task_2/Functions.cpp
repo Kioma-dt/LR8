@@ -31,6 +31,7 @@ int NameToCode(std::string name, std::string * cities, int * codes, int n_cities
             return codes[i];
         }
     }
+
     return -1;
 }
 
@@ -40,6 +41,7 @@ std::string CodeToName(int code, std::string * cities, int * codes, int n_cities
             return cities[i];
         }
     }
+
     return "ERROR";
 }
 
@@ -104,6 +106,44 @@ int CheckNumberOfArray(int size) {
     return input;
 }
 
+std::string CheckName(std::string * cities, int n_cities){
+    std::string name;
+    std::cin >> name;
+    bool correct = false;
+    while(1) {
+        correct = true;
+        for (int i = 0; i < n_cities; i++){
+            if (name == cities[i]){
+                correct = false;
+                break;
+            }
+        }
+        if(correct){
+            return name;
+        }
+        std::cout << "Город с таким именем уже есть!\n";
+    }
+}
+
+int CheckCode(int * codes, int  n_cities){
+    int code;
+    code = CheckUnsigned();
+    bool correct = false;
+    while(1) {
+        correct = true;
+        for (int i = 0; i < n_cities; i++){
+            if (code == codes[i]){
+                correct = false;
+                break;
+            }
+        }
+        if(correct){
+            return code;
+        }
+        std::cout << "Город с таким кодом уже есть!\n";
+    }
+}
+
 int CheckDate(int type, Call call){
     int date;
     while(1){
@@ -138,7 +178,9 @@ int CheckDate(int type, Call call){
                 }
             }
             if (type == 3){
-                return date;
+                if (date >= 1877){
+                    return date;
+                }
             }
         }
         std::cout << "Неверный формат даты!\n";
@@ -220,7 +262,7 @@ unsigned long long CheckTellNumber(bool from_city, Call call, std::string * citi
 void EnterCities(std::string * cities, int *  codes, int n_cities){
     for (int i = 0; i < n_cities;i++){
         std::cout << "Введите город: ";
-        std::cin >> cities[i];
+        cities[i] = CheckName(cities, i);
         std::cout << "Введите код(трехзначное целое неотрицателное число): ";
         while(1){
             codes[i] = CheckUnsigned();
@@ -340,13 +382,16 @@ void ShowInformation(Call * call, int size){
 
 Call *AddCall(Call * call, int * size, std::string * cities, int * codes, int n_cities, bool random_numbers){
     call = AddSpace(call, size);
+    
     EnterCall(call + *size - 1, cities, codes, n_cities, random_numbers);
 
     return call;
 }
 
-int FindCall(Call * call, int start, int end, int n_feature, int feature_i, double feature_d, std::string feature_s){
+int FindCall(Call * call, int start, int end, int n_feature, int feature_i, double feature_d, std::string feature_s, std::string * cities, int * codes, int n_cities){
     for (int i = start; i < end;i++){
+        std::string city_name;
+        int city_code;
         switch(n_feature){
         case 1:
             if (call[i].year == feature_i){
@@ -364,12 +409,24 @@ int FindCall(Call * call, int start, int end, int n_feature, int feature_i, doub
             }
             break;
         case 4:
-            if (call[i].city.name == feature_s){
+            if (!call[i].hasName){
+                city_name = CodeToName(call[i].city.code, cities, codes, n_cities);
+            } 
+            else {
+                city_name = call[i].city.name;
+            }
+            if (city_name == feature_s){
                 return i;
             }
             break;
         case 5:
-            if (call[i].city.code == feature_i){
+            if (call[i].hasName){
+                city_code = NameToCode(call[i].city.name, cities, codes, n_cities);
+            } 
+            else {
+                city_code = call[i].city.code;
+            }
+            if (city_code == feature_i){
                 return i;
             }
             break;
@@ -403,11 +460,12 @@ Call *DeleteCall(Call * call, int * size, int number){
     for (int i = number + 1; i < *size; i++){
         std::swap(call[i], call[i - 1]);
     }
+
     call = DeleteSpace(call, size);
 
     return call;
 }                 
-Call *ChooseForDelete(Call * call, int * size){
+Call *ChooseForDelete(Call * call, int * size, std::string * cities, int * codes, int n_cities){
     if (*size == 0){
         std::cout << "Нет звонков!\n";
         return call;
@@ -417,7 +475,7 @@ Call *ChooseForDelete(Call * call, int * size){
     double feature_d = -1;
     std::string feature_s = "ERROR";
     std::cout << "Введите признак, по которому необходимо удалить звонок:\n";
-    std::cout << "1 - Год\n2 - Месяц\n3 - День\n4 - Название города\n5 - Код города\n6 - Время звонка\n";
+    std::cout << "1 - Год\n2 - Месяц\n3 - День\n4 - Город по названию\n5 - Город по коду\n6 - Время звонка\n";
     std::cout << "7 - Стоимость минуты\n8 - Номер телефона из города\n9 - Номер телефона абонента\n10 - Номер\n";
     while (1){
         input = CheckUnsigned();
@@ -435,28 +493,28 @@ Call *ChooseForDelete(Call * call, int * size){
     else if (input <= 3 || input == 5 || input == 6 || input >=8){
         std::cout << "Введите значение признака: ";
         feature_i = CheckUnsigned();
-        find = FindCall(call, 0, *size, input, feature_i, feature_d, feature_s);
+        find = FindCall(call, 0, *size, input, feature_i, feature_d, feature_s, cities, codes, n_cities);
         while (find != -1){
             call = DeleteCall(call, size, find);
-            find = FindCall(call, find, *size, input, feature_i, feature_d, feature_s);
+            find = FindCall(call, find, *size, input, feature_i, feature_d, feature_s, cities, codes, n_cities);
         }
     }
     else if(input == 7){
         std::cout << "Введите значение признака: ";
         feature_d = CheckDouble();
-        find = FindCall(call, 0, *size, input, feature_i, feature_d, feature_s);
+        find = FindCall(call, 0, *size, input, feature_i, feature_d, feature_s, cities, codes, n_cities);
         while (find != -1){
             call = DeleteCall(call, size, find);
-            find = FindCall(call, find, *size, input, feature_i, feature_d, feature_s);
+            find = FindCall(call, find, *size, input, feature_i, feature_d, feature_s, cities, codes, n_cities);
         }
     }
     else {
         std::cout << "Введите значение признака: ";
         std::cin >> feature_s;
-        find = FindCall(call, 0, *size, input, feature_i, feature_d, feature_s);
+        find = FindCall(call, 0, *size, input, feature_i, feature_d, feature_s, cities, codes, n_cities);
         while (find != -1){
             call = DeleteCall(call, size, find);
-            find = FindCall(call, find, *size, input, feature_i, feature_d, feature_s);
+            find = FindCall(call, find, *size, input, feature_i, feature_d, feature_s, cities, codes, n_cities);
         }
     }
 
@@ -523,4 +581,20 @@ Call *ChooseForChange(Call * call, int size, std::string * cities, int * codes, 
     }
 
     return call;
+}
+
+void OutputCities(Call * call, int size, std::string * cities, int * codes, int n_cities) {
+    for (int i = 0; i < n_cities; i++) {
+        int total_time = 0;
+        double total_cost = 0;
+        std::cout << "Город: " << cities[i] << "\nКод города: " << codes[i];
+        int find = FindCall(call, 0, size, 5, codes[i], 0, "\0", cities, codes, n_cities);
+        while (find != -1){
+            total_time += call[find].time;
+            total_cost += call[find].time * call[find].cost;
+            find = FindCall(call, find + 1, size, 5, codes[i], 0, "\0", cities, codes, n_cities);
+        }
+        std::cout << "\nОбщее время звонков в городе: " << total_time;
+        std::cout << "\nОбщая сумма за звонки в город: " << total_cost << '\n';
+    }
 }
