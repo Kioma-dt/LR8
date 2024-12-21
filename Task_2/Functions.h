@@ -24,3 +24,5 @@ Call *DeleteCall(Call *, int *, int);
 Call *ChooseForDelete(Call *, int *, std::string *, int *, int); 
 Call *ChooseForChange(Call *, int, std::string *, int *, int);
 void OutputCities(Call *, int, std::string *, int *, int);
+void WriteText(Call *, int);
+Call *ChangeText(Call *, int);
