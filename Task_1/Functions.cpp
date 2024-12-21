@@ -1,6 +1,9 @@
 #include <iostream>
 #include <string>
+#include <string.h>
+#include <fstream>
 #include "Struct.h"
+#define SEEK_SET 0
 
 
 int CheckUnsigned() {
@@ -111,7 +114,7 @@ void EnterClient(Client *client, std::string special_street, int special_disrict
     std::cout << "Введите квартиру, в которой проживает клиент: ";
     client->flat = CheckUnsigned();
     if (client->hasStreet){
-        if (client->address.street == special_street) {
+        if (client->address.street == special_street.c_str()) {
             client->discount = special_discount;
         }
         else {
@@ -496,4 +499,99 @@ void FindDiscount(Client * client, int size) {
             middle++;
         }
     }
+}
+
+void WriteBin(Client * client, int size){
+    std::fstream file("BIN.bin", std::ios::out | std::ios::binary);
+
+    for (int i = 0; i < size;i++){
+        file.write((char *)&(client[i]), sizeof(Client));
+    }
+
+    file.close();
+}
+
+Client *ChangeBin(Client *client,int size){
+    if (size == 0){
+        std::cout << "Нет клиентов!\n";
+        return client;
+    }
+    int number;
+    std::cout << "Введите номер клиента, данные которого вы хотите поменять: ";
+    number = CheckNumberOfArray(size);
+    number--;
+    bool exit = false;
+    while (!exit){
+        std::cout << "Выберите, что вы хотите поменять:\n";
+        std::cout << "1 - Фамилия\n2 - Имя\n3 - Отчечтво\n4 - Улица\n5 - Микрорайон\n6 - Дом\n7 - Квартира\n8 - Скидка\n9 - Выйти\n";
+        int input;
+        int temp_i;
+        char temp_c[50]{};
+        std::fstream file("BIN.bin", std::ios::out |  std::ios::binary | std::ios::in);
+        input = CheckUnsigned();
+        switch (input){
+        case 1:
+            std::cout << "Введите новую фамилию: ";
+            std::cin >> client[number].last_name;
+            file.seekp(number*sizeof(Client) + offsetof(Client,last_name), std::ios::beg);
+            file.write((char *)&(client[number].last_name), sizeof(char[50]));
+            file.close();
+            break;
+        case 2:
+            std::cout << "Введите новое имя: ";
+            std::cin >> client[number].first_name;
+            file.seekp(number*sizeof(Client) + offsetof(Client,first_name), std::ios::beg);
+            file.write((char *)&(client[number].first_name), sizeof(char[50]));
+            break;
+        case 3:
+            std::cout << "Введите новое отчество: ";
+            std::cin >> client[number].patronymic;
+            file.seekp(number*sizeof(Client) + offsetof(Client,patronymic), std::ios::beg);
+            file.write((char *)&(client[number].patronymic), sizeof(char[50]));
+            break;
+        case 4:
+            std::cout << "Введите новую улицу: ";
+            std::cin >> client[number].address.street;
+            if (!client[number].hasStreet){
+                client[number].hasStreet = 1;
+            }
+            file.seekp(number*sizeof(Client) + offsetof(Client,address), std::ios::beg);
+            file.write((char *)&(client[number].address.street), sizeof(char[50]));
+            break;
+        case 5:
+            std::cout << "Введите новый микрорайон: ";
+            client[number].address.district = CheckUnsigned();
+            if (client[number].hasStreet){
+                client[number].hasStreet = 0;
+            }
+            file.seekp(number*sizeof(Client) + offsetof(Client,address), std::ios::beg);
+            file.write((char *)&(client[number].address.district), sizeof(char[50]));
+            break;
+        case 6:
+            std::cout << "Введите новый дом: ";
+            client[number].house = CheckUnsigned();
+            file.seekp(number*sizeof(Client) + offsetof(Client,house), std::ios::beg);
+            file.write((char *)&(client[number].house), sizeof(int));
+            break;
+        case 7:
+            std::cout << "Введите новую квартиру: ";
+            client[number].flat = CheckUnsigned();
+            file.seekp(number*sizeof(Client) + offsetof(Client,flat), std::ios::beg);
+            file.write((char *)&(client[number].flat), sizeof(int));
+            break;
+        case 8:
+            std::cout << "Введите новую скидку: ";
+            client[number].discount = CheckDiscount();
+            file.seekp(number*sizeof(Client) + offsetof(Client,last_name), std::ios::beg);
+            file.write((char *)&(client[number].discount), sizeof(int));
+            break;
+        case 9:
+            exit = true;
+            break;
+        default:
+            std::cout << "Неверный номер!\n";
+        }
+    file.close();
+    }
+    return client;
 }

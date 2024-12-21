@@ -4,6 +4,7 @@
 
 int main(){
     bool exit = false;
+    bool act_inf = false;
     Client *client;
     int size = 0;
     std::string special_street;
@@ -57,7 +58,9 @@ int main(){
         std::cout << "5 - найти клиента\n";
         std::cout << "6 - отсортировать клиентов по возрастанию скидки\n";
         std::cout << "7 - вывести клиентов со скидкой 5%(при этом клиенты будут отсортированы по возрастанию скидки)\n";
-        std::cout << "8 - выйти\n";
+        std::cout << "8 - записать информацию в двоичный файл\n";
+        std::cout << "9 - перезаписать информацию в двоичном коде\n";
+        std::cout << "10 - выйти\n";
         int input;
         input = CheckUnsigned();
         switch (input){
@@ -83,6 +86,12 @@ int main(){
             FindDiscount(client, size);
             break;
         case 8:
+            WriteBin(client, size);
+            break;
+        case 9:
+            client = ChangeBin(client, size);
+            break;
+        case 10:
             exit = true;
             break;
         default:
