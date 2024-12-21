@@ -30,7 +30,9 @@ int main(){
         std::cout << "3 - удалить звонок\n";
         std::cout << "4 - изменить информацию о звонке\n";
         std::cout << "5 - вывести по каждому городу общее время разговора и сумму\n";
-        std::cout << "6 - выйти\n";
+        std::cout << "6 - записать информацию в текстовый файл\n";
+        std::cout << "7 - перезаписать информацию в текстовос файле\n";
+        std::cout << "8 - выйти\n";
         int input;
         input = CheckUnsigned();
         switch (input){
@@ -50,6 +52,9 @@ int main(){
             OutputCities(call, size, cities, codes, n_cities);
             break;
         case 6:
+            WriteText(call, size);
+            break;
+        case 8:
             exit = true;
             break;
         default:

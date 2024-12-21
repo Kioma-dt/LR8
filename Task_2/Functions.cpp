@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <cmath>
+#include <fstream>
 #include "Struct.h"
 
 Call *AddSpace(Call *call, int *size){
@@ -597,4 +598,14 @@ void OutputCities(Call * call, int size, std::string * cities, int * codes, int 
         std::cout << "\nОбщее время звонков в городе: " << total_time;
         std::cout << "\nОбщая сумма за звонки в город: " << total_cost << '\n';
     }
+}
+void WriteText(Call * call, int size){
+    std::fstream file("Text.txt", std::ios::out | std::ios::binary);
+
+    std::cout << sizeof(Call);
+    for (int i = 0; i < size; i++) {
+        file.write((char *)&(call[i]), sizeof(Call));
+    }
+
+    file.close();
 }
