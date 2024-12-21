@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <string>
 #include "Functions.h"
 
@@ -21,7 +22,6 @@ int main(){
     std::cin >> random_numbers;
     std::cout << "\n---------------------------------------------\n";
     call = EnterWithSize(&size, cities, codes, n_cities, random_numbers);
-
     while (!exit){
         std::cout << "\n-----------------------------------\n";
         std::cout << "Выберите действие:\n";
@@ -53,6 +53,9 @@ int main(){
             break;
         case 6:
             WriteText(call, size);
+            break;
+        case 7:
+            call = ChangeText(call, size, cities, codes, n_cities);
             break;
         case 8:
             exit = true;
