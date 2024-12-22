@@ -46,8 +46,8 @@ std::string CodeToName(int code, std::string * cities, int * codes, int n_cities
     return "ERROR";
 }
 
-unsigned long long CheckUnsigned() {
-    unsigned long long  input;
+int CheckUnsigned() {
+    int input;
 	char next;
 
 	while (true) {
@@ -227,8 +227,8 @@ City CheckCity(bool hasName, std::string * cities, int * codes, int n_cities){
 }
 
 
-unsigned long long CheckTellNumber(bool from_city, Call call, std::string * cities, int * codes, int n_cities){
-    unsigned long long number;
+int CheckTellNumber(bool from_city, Call call, std::string * cities, int * codes, int n_cities){
+    int number;
     while (1){
         number = CheckUnsigned();
         int first_sign = number / pow(10, 8);
@@ -298,12 +298,12 @@ void EnterCall(Call * call, std::string * cities, int * codes, int n_cities, boo
     call->cost = CheckDouble();
     if (random_numbers){
         if (call->hasName){
-            call->number_caller = 8 * pow(10, 8) + NameToCode(call->city.name, cities, codes, n_cities) * pow(10, 5) + rand() % 99999;
+            call->number_city = 8 * pow(10, 8) + NameToCode(call->city.name, cities, codes, n_cities) * pow(10, 5) + rand() % 99999;
         }
         else{
-            call->number_caller = 8 * pow(10, 8) + call->city.code * pow(10, 5) + rand() % 99999;
+            call->number_city = 8 * pow(10, 8) + call->city.code * pow(10, 5) + rand() % 99999;
         }
-        call->number_city = 8 * pow(10, 8) + rand() % 99999999;
+        call->number_caller = 8 * pow(10, 8) + rand() % 99999999;
     }
     else{
         std::cout << "Номер телефона состоит из 9 цифр, начинается на 8, а затем код города.\n";
@@ -600,12 +600,93 @@ void OutputCities(Call * call, int size, std::string * cities, int * codes, int 
     }
 }
 void WriteText(Call * call, int size){
-    std::fstream file("Text.txt", std::ios::out | std::ios::binary);
-
-    std::cout << sizeof(Call);
+    std::fstream file("Text.txt", std::ios::out | std::ios::trunc | std::ios::in);
     for (int i = 0; i < size; i++) {
-        file.write((char *)&(call[i]), sizeof(Call));
+        file << call[i].year << '\n';
+        file << call[i].month << '\n';
+        file << call[i].day << '\n';
+        if (call[i].hasName){
+            file << call[i].city.name << '\n';
+        }
+        else{
+            file << call[i].city.code << '\n';
+        }
+        file << call[i].time << '\n';
+        file << call[i].cost << '\n';
+        file << call[i].number_city << '\n';
+        file << call[i].number_caller << '\n';
+        file << '\n';
+    }
+    file.close();
+}
+
+Call *ChangeText(Call * call, int size, std::string * cities, int * codes, int n_cities){
+    if (size == 0){
+        std::cout << "Нет звонков!\n";
+        return call;
+    }
+    int number;
+    std::cout << "Введите номер звонка, данные которого вы хотите поменять: ";
+    number = CheckNumberOfArray(size);
+    number--;
+    bool exit = false;
+    while (!exit){
+        std::cout << "Выберите, что вы хотите поменять:\n";
+        std::cout << "1 - Дата\n2 - Название города\n3 - Код города\n4 - Время звонка\n";
+        std::cout << "5 - Стоимость минуты\n6 - Номер телефона из города\n7 - Номер телефона абонента\n8 - Выйти\n";
+        int input;
+        input = CheckUnsigned();
+        switch (input){
+        case 1:
+            std::cout << "Введите новый год: ";
+            call[number].year = CheckDate(3, call[number]);
+            WriteText(call, size);
+            std::cout << "Введите новый месяц: ";
+            call[number].month = CheckDate(2, call[number]);
+            WriteText(call, size);
+            std::cout << "Введите новый день: ";
+            call[number].day = CheckDate(1, call[number]);
+            WriteText(call, size);
+            break;
+        case 2:
+            std::cout << "Введите новое название города: ";
+            call[number].hasName = 1;
+            call[number].city = CheckCity(call[number].hasName, cities, codes, n_cities);
+            WriteText(call, size);
+            break;
+        case 3:
+            std::cout << "Введите новый код города: ";
+            call[number].hasName = 0;
+            call[number].city = CheckCity(call[number].hasName, cities, codes, n_cities);
+            WriteText(call, size);
+            break;
+        case 4:
+            std::cout << "Введите новое врямя звонка: ";
+            call[number].time = CheckUnsigned();
+            WriteText(call, size);
+            break;
+        case 5:
+            std::cout << "Введите новую стоимость минуты: ";
+            call[number].cost = CheckDouble();
+            WriteText(call, size);
+            break;
+        case 6:
+            std::cout << "Введите новый номер телефона из города: ";
+            call[number].number_city = CheckTellNumber(1, call[number], cities, codes, n_cities);
+            WriteText(call, size);
+            break;
+        case 7:
+            std::cout << "Введите новый номер телефона абонента: ";
+            call[number].number_caller = CheckTellNumber(0, call[number], cities, codes, n_cities);
+            WriteText(call, size);
+            break;
+        case 8:
+            exit = true;
+            break;
+        default:
+            std::cout << "Неверный номер!\n";
+        }
     }
 
-    file.close();
+    return call;
 }

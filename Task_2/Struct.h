@@ -2,7 +2,7 @@
 #pragma once
 
 typedef union City{
-    char name[1000];
+    char name[50];
     int code;
 } City;
 
@@ -14,6 +14,6 @@ typedef struct Call{
     City city;
     int time;
     double cost;
-    unsigned long long number_city;
-    unsigned long long number_caller;
+    int number_city;
+    int number_caller;
 } Call;
